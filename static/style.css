@@ -1,0 +1,491 @@
+/* ============================================================
+   CYAN HACKER THEME v3.5 — ADVANCED UI/UX
+   Full Glassmorphism + Neon Glow + Cyber Animations
+   ============================================================ */
+
+:root {
+    --bg: #02070c;
+    --bg-dark: #010307;
+    --panel: rgba(0, 255, 255, 0.04);
+    --glass: rgba(0, 255, 255, 0.08);
+    --border: rgba(0, 255, 255, 0.18);
+    --accent: #00eaff;
+    --accent2: #5ef6ff;
+    --text: #dffaff;
+    --muted: #7fd6e8;
+    --danger: #ff5f69;
+    --card-glow: 0 0 18px rgba(0, 255, 255, 0.14);
+    --neon-glow: 0 0 16px rgba(0, 255, 255, 0.65);
+    --font: 'Inter', sans-serif;
+}
+
+/* ------------------------------------------------------------
+   GLOBAL / BASE
+   ------------------------------------------------------------ */
+* {
+    box-sizing: border-box;
+    font-family: var(--font);
+}
+
+body.dark.cyan {
+    margin: 0;
+    background: radial-gradient(circle at top, #031018, #00040a 70%);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* Cyber grid background */
+body.dark.cyan::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    opacity: 0.08;
+}
+
+/* Page animation */
+.animated {
+    animation: fadeUp 0.5s cubic-bezier(.22,.68,.28,1) forwards;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------------------------
+   SIDEBAR
+   ------------------------------------------------------------ */
+.sidebar {
+    width: 260px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    padding: 28px;
+    background: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(18px);
+    border-right: 1px solid rgba(0, 255, 255, 0.15);
+    box-shadow: var(--card-glow);
+}
+
+.brand .logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.brand .title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.brand .subtitle {
+    font-size: 13px;
+    margin-top: 2px;
+    color: var(--muted);
+}
+
+/* Navigation */
+.nav {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nav-item {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.25s;
+}
+
+.nav-item:hover {
+    background: var(--glass);
+    color: var(--accent2);
+    transform: translateX(6px);
+}
+
+/* ------------------------------------------------------------
+   MAIN AREA
+   ------------------------------------------------------------ */
+.main {
+    margin-left: 260px;
+    padding: 32px;
+    min-height: 100vh;
+}
+
+.topbar h1 {
+    margin: 0;
+    font-size: 26px;
+    text-shadow: var(--neon-glow);
+}
+
+.topbar .muted {
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+/* ------------------------------------------------------------
+   CARDS (Glass Cyber Panels)
+   ------------------------------------------------------------ */
+.card {
+    background: var(--panel);
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--card-glow);
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 0 28px rgba(0, 255, 255, 0.28);
+    transform: translateY(-4px);
+}
+
+.card-head h3 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--accent2);
+    letter-spacing: 0.7px;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(12, 1fr);
+}
+
+.upload-card { grid-column: span 7; }
+.info-card   { grid-column: span 5; }
+.preview-card { grid-column: span 5; }
+.gauge-card { grid-column: span 7; }
+
+/* ------------------------------------------------------------
+   DROPZONE
+   ------------------------------------------------------------ */
+.dropzone {
+    position: relative;
+    width: 100%;
+    min-height: 100px;   /* 🔥 IMPORTANT */
+    padding: 24px;
+    border-radius: 12px;
+
+    border: 2px dashed rgba(0, 255, 255, 0.25);
+    background: rgba(0, 255, 255, 0.03);
+
+    display: flex;              /* 🔥 CENTER FIX */
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: 0.25s;
+    box-sizing: border-box;
+}
+
+/* hover + drag */
+.dropzone:hover,
+.dropzone.dragover {
+    border-color: cyan;
+    background: rgba(0, 255, 255, 0.08);
+    box-shadow: 0 0 18px rgba(0,255,255,0.6);
+}
+
+/* input overlay */
+.dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* text alignment */
+.dz-msg {
+    text-align: center;
+    pointer-events: none;
+}
+
+
+/* ------------------------------------------------------------
+   TOOLS PANEL (Cyber Accordion)
+   ------------------------------------------------------------ */
+.tools-master {
+    margin-top: 14px;
+    padding: 14px;
+    background: rgba(0, 255, 255, 0.03);
+    border: 1px solid rgba(0, 255, 255, 0.12);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.tools-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tool-search {
+    background: rgba(0, 255, 255, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--text);
+}
+
+.tool-category {
+    margin-top: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 255, 0.12);
+}
+
+.cat-head {
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(0, 255, 255, 0.06);
+}
+
+.cat-body {
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    overflow: hidden;
+    transition: 0.3s ease;
+}
+
+/* Tool Row */
+.tool-row {
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 255, 255, 0.12);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    background: rgba(0, 255, 255, 0.04);
+    transition: 0.2s;
+}
+
+.tool-row:hover {
+    background: rgba(0, 255, 255, 0.14);
+    box-shadow: 0 0 14px rgba(0, 255, 255, 0.28);
+    transform: translateY(-3px);
+}
+
+.tool-badge {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(0, 255, 255, 0.14);
+}
+
+/* ------------------------------------------------------------
+   INLINE PREVIEW + EXIF
+   ------------------------------------------------------------ */
+.inline-preview {
+    position: relative;
+    min-height: 160px;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(0, 255, 255, 0.04);
+    border: 1px solid rgba(0, 255, 255, 0.12);
+}
+
+.inline-preview img,
+.inline-preview video {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 10px;
+    box-shadow: var(--card-glow);
+    transition: 0.25s;
+}
+
+.inline-preview:hover img {
+    transform: scale(1.02);
+}
+
+/* EXIF Overlay */
+.exif-overlay {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.52);
+    border-radius: 10px;
+    padding: 10px;
+    width: 220px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+    font-size: 13px;
+    box-shadow: var(--card-glow);
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.exif-overlay.hidden {
+    opacity: 0;
+    transform: translateY(-12px);
+    pointer-events: none;
+}
+
+.exif-head {
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 4px;
+}
+
+/* ------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------ */
+.btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.25s;
+}
+
+.btn.primary {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #000;
+    box-shadow: var(--card-glow);
+}
+
+.btn.primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--neon-glow);
+}
+
+.btn.ghost {
+    background: rgba(0, 255, 255, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    color: var(--accent2);
+}
+
+.btn.ghost:hover {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+/* ------------------------------------------------------------
+   SUSPICION GAUGE — CYBER ANIMATION
+   ------------------------------------------------------------ */
+.circular-chart {
+    width: 160px;
+    height: 160px;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 0 14px rgba(0, 255, 255, 0.4));
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(0, 255, 255, 0.12);
+    stroke-width: 2.6;
+}
+
+.circle {
+    fill: none;
+    stroke: var(--accent2);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 0, 100;
+    animation: sweep 1.6s ease forwards;
+}
+
+@keyframes sweep {
+    from { stroke-dasharray: 0, 100; }
+    to   { stroke-dasharray: var(--finalPct), 100; }
+}
+
+.percentage {
+    transform: rotate(90deg);
+    font-size: 7px;
+    fill: var(--accent2);
+    font-weight: 700;
+}
+
+/* ------------------------------------------------------------
+   RESULTS PAGE
+   ------------------------------------------------------------ */
+.results-main {
+    margin-left: 0;
+    padding: 32px;
+}
+
+.results-grid.container {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: 360px 1fr;
+}
+
+.results-summary {
+    grid-column: 1;
+}
+
+.results-output {
+    grid-column: 2;
+}
+
+.big-score {
+    font-size: 44px;
+    color: var(--accent2);
+    font-weight: 800;
+    text-shadow: var(--neon-glow);
+}
+
+.output {
+    background: rgba(0, 255, 255, 0.06);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    max-height: 480px;
+    overflow: auto;
+    color: var(--accent2);
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+@media (max-width: 980px) {
+
+    .sidebar { display: none; }
+
+    .main {
+        margin-left: 0;
+        padding: 18px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-card,
+    .info-card,
+    .preview-card,
+    .gauge-card {
+        grid-column: span 1;
+    }
+
+    .results-grid.container {
+        grid-template-columns: 1fr;
+    }
+}
