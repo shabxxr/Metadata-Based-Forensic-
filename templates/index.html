@@ -1,0 +1,192 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Metadata-Based Forensic Analysis of Digital Images and Files for Cyber Security</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2d9d6f6f9.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body class="dark cyan">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">👨🏻‍💻</div>
+      <div class="title">Metadata-Based</div>
+      <div class="subtitle">Forensic</div>
+    </div>
+
+    <nav class="nav">
+      <a href="#" class="nav-item active"><i class="fa-solid fa-dashboard"></i> Dashboard</a>
+      <a href="#" class="nav-item"><i class="fa-solid fa-file"></i> Analysis</a>
+      <a href="#" class="nav-item"><i class="fa-solid fa-database"></i> Tools</a>
+      <a href="#" class="nav-item"><i class="fa-solid fa-cogs"></i> Settings</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sample-path">Sample: <code>{{ sample_path }}</code></div>
+      <div class="muted">Run on isolated host only</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Metadata-Based Forensic Analysis of Digital Images and Files for Cyber Security</h1>
+        <p class="muted">Preview, then click <strong>Scan File</strong> to run tools and get a suspicion score.</p>
+      </div>
+      <div class="topbar-right">
+        <div class="badge neon">Upload Here</div>
+      </div>
+    </header>
+
+    <section class="grid">
+      <!-- Upload Card -->
+      <div class="card upload-card">
+        <div class="card-head"><h3><i class="fa-solid fa-upload"></i> Upload / Sample</h3></div>
+
+        <div class="card-body">
+          <!-- Form is only submitted when Scan is clicked -->
+          <form id="scanForm" action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+            <label class="dropzone" id="dropzone">
+              <input type="file" name="file" id="fileInput" accept="*/*">
+              <div class="dz-msg">
+                <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+                <div class="dz-title">Drag & drop file here or click to browse</div>
+                <div class="muted small">Images, PDFs, PCAPs, binaries, videos...</div>
+              </div>
+            </label>
+
+            <div id="inlinePreview" class="inline-preview">
+              <div class="empty small">No file selected</div>
+              <div id="exifOverlay" class="exif-overlay hidden">
+                <div class="exif-head">EXIF • Quick Info</div>
+                <div id="exifBody" class="exif-body"></div>
+              </div>
+            </div>
+
+            <div class="preview-wrapper">
+              <div class="row inline">
+                <label class="checkbox"><input type="checkbox" id="useSample" name="use_sample" value="1"> Use sample file on server</label>
+              </div>
+
+              <!-- Tools panel inside form -->
+              <div class="tools-master">
+                <div class="tools-header">
+                  <h3><i class="fa-solid fa-toolbox"></i> Analysis Tools</h3>
+                  <input type="text" id="toolSearch" class="tool-search" placeholder="Search tools...">
+                </div>
+
+                <div class="tools-container">
+                  {% macro category(title, icon, tools) %}
+                  <div class="tool-category">
+                    <div class="cat-head">
+                      <div class="cat-left"><i class="fa-solid {{ icon }}"></i> <span>{{ title }}</span></div>
+                      <div class="cat-actions">
+                        <button type="button" class="mini-btn select-all">All</button>
+                        <button type="button" class="mini-btn deselect-all">None</button>
+                        <button type="button" class="toggle-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                      </div>
+                    </div>
+                    <div class="cat-body">
+                      {% for t in tools %}
+                      <label class="tool-item tool-row" data-tool="{{ t }}">
+                        <input type="checkbox" name="tools" value="{{ t }}"> 
+                        <span class="tool-label">{{ t }}</span>
+                        <span class="tool-badge safe">safe</span>
+                      </label>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% endmacro %}
+
+                  {{ category("Image Tools", "fa-image", image_tools) }}
+                  {{ category("Video / Audio Tools", "fa-film", video_tools) }}
+                  {{ category("Binary / Firmware Tools", "fa-microchip", binary_tools) }}
+                  {{ category("Document Tools", "fa-file-lines", doc_tools) }}
+                  {{ category("Network Tools", "fa-network-wired", network_tools) }}
+                </div>
+              </div>
+
+              <!-- Scan button triggers form submit -->
+              <div style="margin-top:12px; display:flex; gap:8px;">
+                <button id="scanBtn" type="button" class="btn primary" title="Scan the uploaded file"><i class="fa-solid fa-magnifying-glass"></i> Scan File</button>
+                <button id="btnClear" type="button" class="btn ghost">Clear</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Danger / Info Card -->
+      <div class="card info-card">
+        <div class="card-head"><h3><i class="fa-solid fa-skull-crossbones"></i> Dangerous / GUI Tools (Info Only)</h3></div>
+        <div class="card-body">
+          <p class="muted">These tools require <strong>root</strong> or GUI and are NOT executed here.</p>
+          <div class="danger-grid">
+            {% for d in dangerous_tools %}
+              <div class="danger-chip" title="Info-only: {{ d }}"><i class="fa-solid fa-shield-halved"></i> <span>{{ d }}</span></div>
+            {% endfor %}
+          </div>
+          <div class="tips">
+            <h4 class="neon">Quick Tips</h4>
+            <ul>
+              <li>Install missing CLI tools on host to run them.</li>
+              <li>Use Docker for sandboxing heavy tools.</li>
+              <li>Don't expose this UI publicly.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Run Status -->
+      <div class="card preview-card">
+        <div class="card-head"><h3><i class="fa-solid fa-info-circle"></i> Run Status</h3></div>
+        <div class="card-body preview-body">
+          <div class="status-box">
+            <div class="status-line">Upload a file then click <strong>Scan File</strong> to run analysis.</div>
+            <ul class="status-notes">
+              <li>Inline preview shows image/video + EXIF overlay.</li>
+              <li>Selected tools will run on the server ONLY after scanning.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suspicion Gauge -->
+      <div class="card gauge-card">
+        <div class="card-head"><h3><i class="fa-solid fa-gauge-high"></i> Suspicion Gauge</h3></div>
+        <div class="card-body center">
+          <div class="gauge">
+            <svg viewBox="0 0 36 36" class="circular-chart neon">
+              <path class="circle-bg"
+                d="M18 2.0845
+                   a 15.9155 15.9155 0 0 1 0 31.831
+                   a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path class="circle"
+                stroke-dasharray="0, 100"
+                d="M18 2.0845
+                   a 15.9155 15.9155 0 0 1 0 31.831
+                   a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <text x="18" y="20.35" class="percentage">0%</text>
+            </svg>
+            <div class="gauge-note muted">Score will update after analysis</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer class="foot">
+      <div>&copy; Forensic Lab • Run on isolated machines</div>
+    </footer>
+  </main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
