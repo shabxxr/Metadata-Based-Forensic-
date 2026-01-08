@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Results — Cyan Forensic Lab v3</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2d9d6f6f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body class="dark cyan">
+
+  <main class="main results-main animated">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1><i class="fa-solid fa-file-waveform"></i> Analysis Results</h1>
+        <p class="muted small">File Analyzed: <code style="font-size:13px;">{{ filename }}</code></p>
+      </div>
+
+      <div class="topbar-right">
+        <a href="{{ url_for('index') }}" class="btn ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <a href="{{ json_download }}" class="btn primary"><i class="fa-solid fa-download"></i> Download JSON</a>
+      </div>
+    </header>
+
+    <section class="results-grid container">
+      <div class="card results-summary animated">
+        <div class="card-head"><h3><i class="fa-solid fa-shield-halved"></i> Verdict Summary</h3></div>
+        <div class="card-body">
+          <div class="verdict-row">
+            <div class="big-score neon">{{ score }}%</div>
+            <div class="verdict-text">
+              <div class="verdict-label neon-strong">{{ verdict }}</div>
+              {% if reasons %}
+              <ul class="reasons-list">
+                {% for r in reasons %}
+                <li>{{ r }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card results-output animated">
+        <div class="card-head"><h3><i class="fa-solid fa-terminal"></i> Tool Execution Output</h3></div>
+        <div class="card-body">
+          {% for tool, out in results.items() %}
+            <div class="tool-block animated-fast">
+              <div class="tool-title">
+                <strong class="tool-name"><i class="fa-solid fa-wrench"></i> {{ tool }}</strong>
+                {% if out.get("error") %}
+                  <span class="tag bad"><i class="fa-solid fa-circle-xmark"></i> Error</span>
+                {% else %}
+                  <span class="tag ok"><i class="fa-solid fa-check"></i> OK</span>
+                {% endif %}
+              </div>
+
+              <pre class="output code-block">
+{% if out.get("error") %}
+⚠️ Error:
+{{ out.get("error") }}
+{% else %}
+▶ Command:
+{{ out.get("cmd") }}
+
+📌 Return Code:
+{{ out.get("returncode") }}
+
+⏱️ Time Taken:
+{{ out.get("elapsed") }} seconds
+
+🧪 STDOUT:
+{{ out.get("stdout")|e }}
+
+⚠️ STDERR:
+{{ out.get("stderr")|e }}
+{% endif %}
+              </pre>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div>&copy; Forensic Lab — Cyan v3</div>
+    </footer>
+  </main>
+
+<!-- load main js then call gauge update -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+  // after script loads, update the gauge with server score (safe integer)
+  window.addEventListener('load', function(){
+    try {
+      const score = {{ score }};
+      if (window.updateGauge) window.updateGauge(score);
+    } catch(e){}
+  });
+</script>
+</body>
+</html>
